@@ -64,4 +64,3 @@ This is a simple To-Do List API built with Rust and the Axum framework.
 
 * **Method:** `GET`
 * **URL:** `/todos/{id}`
-* 
