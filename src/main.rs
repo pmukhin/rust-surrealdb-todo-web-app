@@ -32,11 +32,15 @@ async fn main() -> anyhow::Result<()> {
     let server_url = std::env::var("SERVER_URL")?;
     let log_level = std::env::var("LOG_LEVEL")?;
 
-    let db = Surreal::new::<Ws>("localhost:8000").await?;
+    let db_url = std::env::var("DB_URL")?;
+    let db_user = std::env::var("DB_USER")?;
+    let db_pass = std::env::var("DB_PASS")?;
+
+    let db = Surreal::new::<Ws>(&db_url).await?;
 
     db.signin(Root {
-        username: "root",
-        password: "root",
+        username: &db_user,
+        password: &db_pass,
     })
     .await?;
 
