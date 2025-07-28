@@ -79,3 +79,43 @@ pub async fn action(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_validate_empty_title() {
+        let create_todo = CreateTodo {
+            title: "".to_string(),
+        };
+        let result = create_todo.validate();
+        assert!(result.is_err());
+        match result.err().unwrap() {
+            ValidationError::EmptyTitle => (),
+            _ => panic!("Expected EmptyTitle error"),
+        }
+    }
+
+    #[test]
+    fn test_validate_title_too_long() {
+        let create_todo = CreateTodo {
+            title: "a".repeat(256),
+        };
+        let result = create_todo.validate();
+        assert!(result.is_err());
+        match result.err().unwrap() {
+            ValidationError::TitleTooLong => (),
+            _ => panic!("Expected TitleTooLong error"),
+        }
+    }
+
+    #[test]
+    fn test_validate_valid_title() {
+        let create_todo = CreateTodo {
+            title: "A valid title".to_string(),
+        };
+        let result = create_todo.validate();
+        assert!(result.is_ok());
+    }
+}
