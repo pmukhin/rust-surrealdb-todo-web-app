@@ -57,6 +57,9 @@ This is a simple To-Do List API built with Rust and the Axum framework.
 
 * **Method:** `GET`
 * **URL:** `/todos`
+* **Query Params:**
+  * `limit` (optional): The maximum number of items to return. Defaults to 20.
+  * `offset` (optional): The number of items to skip. Defaults to 0.
 
 ### Get a To-Do by ID
 
