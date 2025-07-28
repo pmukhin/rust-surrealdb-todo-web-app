@@ -48,8 +48,7 @@ This is a simple To-Do List API built with Rust and the Axum framework.
 
   ```json
   {
-    "title": "My first todo",
-    "description": "This is a description of my first todo."
+    "title": "My first todo"
   }
   ```
 
