@@ -8,8 +8,10 @@ use crate::app_state::AppState;
 use axum::body::Body;
 use axum::http::StatusCode;
 use axum::middleware::Next;
-use axum::response::Response;
+use axum::response::{IntoResponse, Response};
 use axum::{extract::Request, middleware, routing::get};
+use lazy_static::lazy_static;
+use prometheus::{Encoder, IntCounter, TextEncoder};
 use std::str::FromStr;
 use std::sync::Arc;
 use surrealdb::Surreal;
@@ -20,9 +22,25 @@ use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
 use tracing::Span;
 
+lazy_static! {
+    static ref HTTP_REQUESTS_TOTAL: IntCounter = prometheus::register_int_counter!(
+        "todo_api_http_requests_total",
+        "Total number of HTTP requests"
+    )
+    .unwrap();
+}
+
 async fn auth(request: Request<Body>, next: Next) -> Result<Response, StatusCode> {
     // our authentication logic here...
     Ok(next.run(request).await)
+}
+
+async fn metrics_handler() -> impl IntoResponse {
+    let encoder = TextEncoder::new();
+    let metric_families = prometheus::gather();
+    let mut buffer = Vec::new();
+    encoder.encode(&metric_families, &mut buffer).unwrap();
+    String::from_utf8(buffer).unwrap()
 }
 
 #[tokio::main]
@@ -59,9 +77,13 @@ async fn main() -> anyhow::Result<()> {
     let app = axum::Router::new()
         .route("/todos", get(paginate::action).post(create::action))
         .route("/todos/{id}", get(find_by_id::action))
+        .route("/metrics", get(metrics_handler))
         .layer(
             ServiceBuilder::new().layer(TraceLayer::new_for_http().on_request(
-                |req: &Request, _span: &Span| tracing::debug!("{} {}", req.method(), req.uri()),
+                |req: &Request, _span: &Span| {
+                    HTTP_REQUESTS_TOTAL.inc();
+                    tracing::debug!("{} {}", req.method(), req.uri());
+                },
             )),
         )
         .layer(middleware::from_fn(auth))

@@ -17,4 +17,5 @@ uuid = { version = "1.17.0", features = ["v4", "v5", "serde"] }
 thiserror = "2.0.12"
 surrealdb = "2.3.7"
 anyhow = "1.0.98"
-rand = "0.9.2"
+prometheus = "0.14.0"
+lazy_static = "1.4"

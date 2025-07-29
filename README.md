@@ -36,7 +36,7 @@ This is a simple To-Do List API built with Rust and the Axum framework.
    cargo run
    ```
 
-   The application will be running at `http://localhost:3000`.
+   The application will be running at `http://localhost:3001`.
 
 ## API Endpoints
 
